@@ -13,6 +13,7 @@ import UIKit
 class TableDataViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {
     
     var tableData = TableData()
+    var tableView: UITableView?
     
     func generateTableData() {
     }
