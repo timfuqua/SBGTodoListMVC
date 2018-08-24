@@ -67,6 +67,8 @@ class TodoListViewController: TableDataViewController {
             if allTasks.isEmpty && tableView?.isEditing == true {
                 exitEditMode()
             }
+            
+            updateView()
         }
     }
     private var uncompletedTasks: [NSManagedObject] = []
@@ -98,8 +100,9 @@ extension TodoListViewController {
     private func enterEditMode() {
         tableView?.setEditing(true, animated: true)
         let cancelButton = UIBarButtonItem(barButtonSystemItem: .cancel, target: self, action: #selector(cancelButtonPressed))
+        let removeAllButton = UIBarButtonItem(title: "Remove All", style: .plain, target: self, action: #selector(removeAllButtonPressed))
         navigationItem.leftBarButtonItems = [cancelButton]
-        navigationItem.rightBarButtonItems = []
+        navigationItem.rightBarButtonItems = [removeAllButton]
     }
     
     private func exitEditMode() {
@@ -108,6 +111,69 @@ extension TodoListViewController {
         let addButton = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(addButtonPressed))
         navigationItem.leftBarButtonItems = allTasks.isEmpty ? [] : [editButton]
         navigationItem.rightBarButtonItems = [addButton]
+    }
+    
+    private func newTask() {
+        let alert = UIAlertController(title: "New Task", message: "Add a new task", preferredStyle: .alert)
+        let saveAction = UIAlertAction(title: "Save", style: .default) { [unowned self] action in
+            guard let textField = alert.textFields?.first, let taskTitle = textField.text else { return }
+            self.saveTask(withTitle: taskTitle)
+        }
+        
+        let cancelAction = UIAlertAction(title: "Cancel", style: .default)
+        
+        alert.addTextField()
+        
+        alert.addAction(saveAction)
+        alert.addAction(cancelAction)
+        
+        present(alert, animated: true)
+    }
+    
+    private func saveTask(withTitle title: String) {
+        guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else { return }
+        let managedContext = appDelegate.persistentContainer.viewContext
+        let entity = NSEntityDescription.entity(forEntityName: "TodoTask", in: managedContext)!
+        let todoTask = NSManagedObject(entity: entity, insertInto: managedContext)
+        
+        todoTask.setValue(title, forKey: "title")
+        
+        do {
+            try managedContext.save()
+            allTasks.append(todoTask)
+        } catch let error as NSError {
+            debugLog("\(error)")
+        }
+    }
+    
+    private func remove(_ task: NSManagedObject) {
+        if let taskObjectIndex = allTasks.index(of: task) {
+            guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else { return }
+            let managedContext = appDelegate.persistentContainer.viewContext
+            managedContext.delete(task)
+            allTasks.remove(at: taskObjectIndex)
+            
+            do {
+                try managedContext.save()
+            } catch let error as NSError {
+                debugLog("\(error)")
+            }
+        }
+    }
+    
+    @objc private func removeAllTasks() {
+        guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else { return }
+        let managedContext = appDelegate.persistentContainer.viewContext
+        let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "TodoTask")
+        let deleteAllRequest = NSBatchDeleteRequest(fetchRequest: fetchRequest)
+        
+        do {
+            try managedContext.execute(deleteAllRequest)
+            try managedContext.save()
+            allTasks.removeAll()
+        } catch let error as NSError {
+            debugLog("\(error)")
+        }
     }
     
     @objc private func editButtonPressed(_ sender: UIBarButtonItem) {
@@ -122,7 +188,23 @@ extension TodoListViewController {
     
     @objc private func addButtonPressed(_ sender: UIBarButtonItem) {
         debugLog()
+        newTask()
+    }
+    
+    @objc private func removeAllButtonPressed(_ sender: UIBarButtonItem) {
+        debugLog()
         
+        let alert = UIAlertController(title: "Remove All Tasks", message: "Are you sure you want to remove all tasks?", preferredStyle: .alert)
+        let yesAction = UIAlertAction(title: "Yes", style: .destructive) { [unowned self] action in
+            self.removeAllTasks()
+        }
+        
+        let cancelAction = UIAlertAction(title: "Cancel", style: .default)
+        
+        alert.addAction(yesAction)
+        alert.addAction(cancelAction)
+        
+        present(alert, animated: true)
     }
 }
 
@@ -133,7 +215,7 @@ extension TodoListViewController {
         super.viewDidLoad()
         debugLog()
         
-        initializeDebugDataSource()
+        initializeDataSource()
         initializeTableDataCustomDescription()
         intializeTitle()
     }
@@ -164,28 +246,17 @@ extension TodoListViewController {
         navigationItem.title = "Todo List"
     }
     
-    private func initializeDebugDataSource() {
+    private func initializeDataSource() {
         guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else { return }
         
         let managedContext = appDelegate.persistentContainer.viewContext
-        let entity = NSEntityDescription.entity(forEntityName: "TodoTask", in: managedContext)!
-        
-        let debugTaskTitles = ["alpha", "beta", "gamma"]
-        var allDebugTasks: [NSManagedObject] = []
-        
-        debugTaskTitles.forEach { title in
-            let todoTask = NSManagedObject(entity: entity, insertInto: managedContext)
-            todoTask.setValue(title, forKey: "title")
-            allDebugTasks.append(todoTask)
-//            do {
-//                try managedContext.save()
-//                allDebugTasks.append(todoTask)
-//            } catch let error as NSError {
-//                print("\(error); \(error.userInfo)")
-//            }
+        let fetchRequest = NSFetchRequest<NSManagedObject>(entityName: "TodoTask")
+
+        do {
+            allTasks = try managedContext.fetch(fetchRequest)
+        } catch let error as NSError {
+            debugLog("\(error)")
         }
-        
-        allTasks = allDebugTasks
     }
     
     private func initializeTableDataCustomDescription() {
@@ -394,18 +465,12 @@ extension TodoListViewController {
 
         if editingStyle == .delete {
             if sectionAndItem.0 == .uncompleted {
-                if let taskObjectIndex = allTasks.index(of: uncompletedTasks[indexPath.row]) {
-                    allTasks.remove(at: taskObjectIndex)
-                }
+                remove(uncompletedTasks[indexPath.row])
             } else if sectionAndItem.0 == .completed {
-                if let taskObjectIndex = allTasks.index(of: completedTasks[indexPath.row]) {
-                    allTasks.remove(at: taskObjectIndex)
-                }
+                remove(completedTasks[indexPath.row])
             } else {
                 return
             }
-            
-            updateView()
         }
     }
 }
