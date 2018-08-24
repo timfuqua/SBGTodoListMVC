@@ -63,6 +63,10 @@ class TodoListViewController: TableDataViewController {
             let separatedTasks = allTasks.separate(predicate: { (($0.value(forKey: "title") as? String) ?? "").count % 2 == 0 })
             uncompletedTasks = separatedTasks.matching
             completedTasks = separatedTasks.notMatching
+            
+            if allTasks.isEmpty && tableView?.isEditing == true {
+                exitEditMode()
+            }
         }
     }
     private var uncompletedTasks: [NSManagedObject] = []
@@ -70,7 +74,7 @@ class TodoListViewController: TableDataViewController {
 
     // MARK: @IBOutlets
     @IBOutlet private weak var todoListTableView: UITableView!
-
+    
     // MARK: TableDataViewController generator
     override func generateTableData() {
         debugLog()
@@ -89,6 +93,40 @@ class TodoListViewController: TableDataViewController {
 }
 
 
+// MARK:- @IBActions
+extension TodoListViewController {
+    private func enterEditMode() {
+        tableView?.setEditing(true, animated: true)
+        let cancelButton = UIBarButtonItem(barButtonSystemItem: .cancel, target: self, action: #selector(cancelButtonPressed))
+        navigationItem.leftBarButtonItems = [cancelButton]
+        navigationItem.rightBarButtonItems = []
+    }
+    
+    private func exitEditMode() {
+        tableView?.setEditing(false, animated: true)
+        let editButton = UIBarButtonItem(barButtonSystemItem: .edit, target: self, action: #selector(editButtonPressed))
+        let addButton = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(addButtonPressed))
+        navigationItem.leftBarButtonItems = allTasks.isEmpty ? [] : [editButton]
+        navigationItem.rightBarButtonItems = [addButton]
+    }
+    
+    @objc private func editButtonPressed(_ sender: UIBarButtonItem) {
+        debugLog()
+        enterEditMode()
+    }
+    
+    @objc private func cancelButtonPressed(_ sender: UIBarButtonItem) {
+        debugLog()
+        exitEditMode()
+    }
+    
+    @objc private func addButtonPressed(_ sender: UIBarButtonItem) {
+        debugLog()
+        
+    }
+}
+
+
 // MARK:- life cycle
 extension TodoListViewController {
     override func viewDidLoad() {
@@ -104,11 +142,10 @@ extension TodoListViewController {
         super.viewWillAppear(animated)
         debugLog()
         
-        NotificationCenter.default.removeObserver(self, name: NSNotification.Name.UIDeviceOrientationDidChange, object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(TodoListViewController.updateView), name: NSNotification.Name.UIDeviceOrientationDidChange, object: nil)
-        
+        addObservers()
         tableView = todoListTableView
         
+        exitEditMode()
         updateView()
     }
     
@@ -116,7 +153,7 @@ extension TodoListViewController {
         super.viewWillDisappear(animated)
         debugLog()
         
-        NotificationCenter.default.removeObserver(self, name: NSNotification.Name.UIDeviceOrientationDidChange, object: nil)
+        removeObservers()
     }
 }
 
@@ -153,6 +190,15 @@ extension TodoListViewController {
     
     private func initializeTableDataCustomDescription() {
         tableData.customDescription = { [weak self] in "tableData:\n" + (self?.tableData.sections.compactMap({ $0.customDescription() }).joined(separator: "\n") ?? "") }
+    }
+    
+    private func addObservers() {
+        NotificationCenter.default.removeObserver(self, name: NSNotification.Name.UIDeviceOrientationDidChange, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(updateView), name: NSNotification.Name.UIDeviceOrientationDidChange, object: nil)
+    }
+    
+    private func removeObservers() {
+        NotificationCenter.default.removeObserver(self, name: NSNotification.Name.UIDeviceOrientationDidChange, object: nil)
     }
 }
 
@@ -341,5 +387,43 @@ extension TodoListViewController {
         default:
             return UITableViewCell()
         }
+    }
+    
+    func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCellEditingStyle, forRowAt indexPath: IndexPath) {
+        guard let sectionAndItem = getSectionAndItem(forIndexPath: indexPath) else { return }
+
+        if editingStyle == .delete {
+            if sectionAndItem.0 == .uncompleted {
+                if let taskObjectIndex = allTasks.index(of: uncompletedTasks[indexPath.row]) {
+                    allTasks.remove(at: taskObjectIndex)
+                }
+            } else if sectionAndItem.0 == .completed {
+                if let taskObjectIndex = allTasks.index(of: completedTasks[indexPath.row]) {
+                    allTasks.remove(at: taskObjectIndex)
+                }
+            } else {
+                return
+            }
+            
+            updateView()
+        }
+    }
+}
+
+
+// MARK:- UITableViewDelegate
+extension TodoListViewController {
+    func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
+        guard let sectionAndItem = getSectionAndItem(forIndexPath: indexPath) else { return false }
+
+        switch sectionAndItem {
+        case let (_,item) where item == .noTasks:
+            return false
+        default:
+            return true
+        }
+    }
+    func tableView(_ tableView: UITableView, accessoryButtonTappedForRowWith indexPath: IndexPath) {
+        debugLog("section: \(indexPath.section); row: \(indexPath.row)")
     }
 }
