@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import CoreData
 
 
 // MARK:- TodoListViewController sections
@@ -57,15 +58,15 @@ private extension TodoListViewController {
 class TodoListViewController: TableDataViewController {
     
     // MARK: vars
-    private var allTasks: [String] = [] {
+    private var allTasks: [NSManagedObject] = [] {
         didSet {
-            let separatedTasks = allTasks.separate(predicate: { $0.count % 2 == 0 })
+            let separatedTasks = allTasks.separate(predicate: { (($0.value(forKey: "title") as? String) ?? "").count % 2 == 0 })
             uncompletedTasks = separatedTasks.matching
             completedTasks = separatedTasks.notMatching
         }
     }
-    private var uncompletedTasks: [String] = []
-    private var completedTasks: [String] = []
+    private var uncompletedTasks: [NSManagedObject] = []
+    private var completedTasks: [NSManagedObject] = []
 
     // MARK: @IBOutlets
     @IBOutlet private weak var todoListTableView: UITableView!
@@ -96,6 +97,7 @@ extension TodoListViewController {
         
         initializeDebugDataSource()
         initializeTableDataCustomDescription()
+        intializeTitle()
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -121,8 +123,32 @@ extension TodoListViewController {
 
 // MARK:- initialization
 extension TodoListViewController {
+    private func intializeTitle() {
+        navigationItem.title = "Todo List"
+    }
+    
     private func initializeDebugDataSource() {
-        allTasks = ["alpha", "beta", "gamma"]
+        guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else { return }
+        
+        let managedContext = appDelegate.persistentContainer.viewContext
+        let entity = NSEntityDescription.entity(forEntityName: "TodoTask", in: managedContext)!
+        
+        let debugTaskTitles = ["alpha", "beta", "gamma"]
+        var allDebugTasks: [NSManagedObject] = []
+        
+        debugTaskTitles.forEach { title in
+            let todoTask = NSManagedObject(entity: entity, insertInto: managedContext)
+            todoTask.setValue(title, forKey: "title")
+            allDebugTasks.append(todoTask)
+//            do {
+//                try managedContext.save()
+//                allDebugTasks.append(todoTask)
+//            } catch let error as NSError {
+//                print("\(error); \(error.userInfo)")
+//            }
+        }
+        
+        allTasks = allDebugTasks
     }
     
     private func initializeTableDataCustomDescription() {
@@ -304,9 +330,9 @@ extension TodoListViewController {
             
             switch section {
             case .uncompleted:
-                cell.textLabel?.text = uncompletedTasks[indexPath.row]
+                cell.textLabel?.text = uncompletedTasks[indexPath.row].value(forKey: "title") as? String
             case .completed:
-                cell.textLabel?.text = completedTasks[indexPath.row]
+                cell.textLabel?.text = completedTasks[indexPath.row].value(forKey: "title") as? String
             default:
                 fatalError()
             }
