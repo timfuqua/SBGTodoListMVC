@@ -20,5 +20,6 @@ class TodoListViewController: UIViewController {
 extension TodoListViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
+        debugLog()
     }
 }
