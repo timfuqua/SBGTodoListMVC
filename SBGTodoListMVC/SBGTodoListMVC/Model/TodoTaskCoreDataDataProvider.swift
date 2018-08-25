@@ -1,5 +1,5 @@
 //
-//  TodoTaskManager.swift
+//  TodoTaskCoreDataDataProvider.swift
 //  SBGTodoListMVC
 //
 //  Created by Tim Fuqua on 8/25/18.
@@ -10,8 +10,10 @@ import UIKit
 import CoreData
 
 
-// MARK:- TodoTaskManager
-class TodoTaskManager {
+// MARK:- TodoTaskCoreDataDataProvider
+class TodoTaskCoreDataDataProvider: DataProvider {
+
+    typealias T = NSManagedObject
     
     // MARK: private vars
     private var allTasks: [NSManagedObject] = []
@@ -40,7 +42,7 @@ class TodoTaskManager {
 
 
 // MARK:- initialize
-extension TodoTaskManager {
+extension TodoTaskCoreDataDataProvider {
     func fetchAllTasks() {
         guard let managedContext = managedContext else { return }
         
@@ -55,7 +57,11 @@ extension TodoTaskManager {
 
 
 // MARK:- get
-extension TodoTaskManager {
+extension TodoTaskCoreDataDataProvider {
+    func getAll() -> [NSManagedObject] {
+        return getAllTasks()
+    }
+    
     func getAllTasks(afterFetch fetch: Bool = true) -> [NSManagedObject] {
         if fetch {
             fetchAllTasks()
@@ -67,7 +73,11 @@ extension TodoTaskManager {
 
 
 // MARK:- add
-extension TodoTaskManager {
+extension TodoTaskCoreDataDataProvider {
+    func add(_ value: NSManagedObject) {
+        addTask()
+    }
+    
     func addTask() {
         guard let managedContext = managedContext else { return }
         guard let todoTaskEntity = todoTaskEntity else { return }
@@ -86,7 +96,11 @@ extension TodoTaskManager {
 
 
 // MARK:- remove
-extension TodoTaskManager {
+extension TodoTaskCoreDataDataProvider {
+    func remove(_ value: NSManagedObject) -> Bool {
+        return removeTask()
+    }
+    
     func removeTask() -> Bool {
         guard let managedContext = managedContext else { return false }
         
@@ -103,6 +117,10 @@ extension TodoTaskManager {
             debugLog("\(error)")
             return false
         }
+    }
+    
+    func removeAll() {
+        removeAllTasks()
     }
     
     func removeAllTasks() {
