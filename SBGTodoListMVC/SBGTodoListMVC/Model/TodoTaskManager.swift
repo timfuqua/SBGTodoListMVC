@@ -6,14 +6,29 @@
 //  Copyright © 2018 SBGCodeTest. All rights reserved.
 //
 
-import Foundation
+import UIKit
 import CoreData
 
 
 // MARK:- TodoTaskManager
 class TodoTaskManager {
     
+    // MARK: private vars
     private var allTasks: [NSManagedObject] = []
+    
+    // MARK: CoreData
+    var appDelegate: AppDelegate? {
+        return UIApplication.shared.delegate as? AppDelegate
+    }
+    
+    var managedContext: NSManagedObjectContext? {
+        return appDelegate?.persistentContainer.viewContext
+    }
+    
+    var todoTaskEntity: NSEntityDescription? {
+        guard let managedContext = managedContext else { return nil }
+        return NSEntityDescription.entity(forEntityName: "TodoTask", in: managedContext)
+    }
     
 }
 
@@ -34,7 +49,14 @@ extension TodoTaskManager {
 
 // MARK:- add
 extension TodoTaskManager {
-    
+    func addTask() {
+        guard let managedContext = managedContext else { return }
+        guard let todoTaskEntity = todoTaskEntity else { return }
+        let addedTask = NSManagedObject(entity: todoTaskEntity, insertInto: managedContext)
+        
+        addedTask.setValue("Test", forKey: "title")
+        allTasks.append(addedTask)
+    }
 }
 
 
