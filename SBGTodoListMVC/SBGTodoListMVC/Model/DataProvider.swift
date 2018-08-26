@@ -14,6 +14,6 @@ protocol DataProvider: class {
     associatedtype T
     func getAll() -> [T]
     func add(_ value: T)
-    func remove(_ value: T) -> Bool
+    @discardableResult func remove(_ value: T) -> Bool
     func removeAll()
 }

@@ -45,7 +45,7 @@ extension TodoTaskInfoDataProvider {
 
 // MARK:- DataProvider; remove
 extension TodoTaskInfoDataProvider {
-    func remove(_ value: TodoTaskInfo) -> Bool {
+    @discardableResult func remove(_ value: TodoTaskInfo) -> Bool {
         return coreDataDataProvider.remove(value)
     }
     

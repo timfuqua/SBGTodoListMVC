@@ -92,7 +92,7 @@ extension TodoTaskCoreDataDataProvider {
 
 // MARK:- remove
 extension TodoTaskCoreDataDataProvider {
-    func remove(_ value: NSManagedObject) -> Bool {
+    @discardableResult func remove(_ value: NSManagedObject) -> Bool {
         guard let managedContext = managedContext else { return false }
         
         managedContext.delete(value)

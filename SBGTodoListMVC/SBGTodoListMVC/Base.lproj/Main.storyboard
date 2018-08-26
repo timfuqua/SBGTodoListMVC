@@ -33,13 +33,42 @@
                                                     <autoresizingMask key="autoresizingMask"/>
                                                 </tableViewCellContentView>
                                             </tableViewCell>
-                                            <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" selectionStyle="blue" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="taskCell" id="K7B-2i-UFa">
+                                            <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" selectionStyle="blue" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="taskCell" id="K7B-2i-UFa" customClass="TodoTaskInfoTableViewCell" customModule="SBGTodoListMVC" customModuleProvider="target">
                                                 <rect key="frame" x="0.0" y="72" width="375" height="44"/>
                                                 <autoresizingMask key="autoresizingMask"/>
                                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="K7B-2i-UFa" id="ASN-UV-Hms">
                                                     <rect key="frame" x="0.0" y="0.0" width="375" height="43.5"/>
                                                     <autoresizingMask key="autoresizingMask"/>
+                                                    <subviews>
+                                                        <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="k6p-iL-N9C" userLabel="PaddingView">
+                                                            <rect key="frame" x="0.0" y="0.0" width="375" height="43.5"/>
+                                                            <subviews>
+                                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="hq6-zi-4NL" userLabel="TitleLabel">
+                                                                    <rect key="frame" x="20" y="4" width="335" height="35.5"/>
+                                                                    <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                                                    <nil key="textColor"/>
+                                                                    <nil key="highlightedColor"/>
+                                                                </label>
+                                                            </subviews>
+                                                            <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                                            <constraints>
+                                                                <constraint firstItem="hq6-zi-4NL" firstAttribute="trailing" secondItem="k6p-iL-N9C" secondAttribute="trailing" constant="-20" id="GC8-Es-bIs"/>
+                                                                <constraint firstItem="hq6-zi-4NL" firstAttribute="bottom" secondItem="k6p-iL-N9C" secondAttribute="bottom" constant="-4" id="dgI-AS-fqG"/>
+                                                                <constraint firstItem="hq6-zi-4NL" firstAttribute="leading" secondItem="k6p-iL-N9C" secondAttribute="leading" constant="20" id="qVK-PJ-3EK"/>
+                                                                <constraint firstItem="hq6-zi-4NL" firstAttribute="top" secondItem="k6p-iL-N9C" secondAttribute="top" constant="4" id="xL2-Kw-9h4"/>
+                                                            </constraints>
+                                                        </view>
+                                                    </subviews>
+                                                    <constraints>
+                                                        <constraint firstItem="k6p-iL-N9C" firstAttribute="bottom" secondItem="ASN-UV-Hms" secondAttribute="bottom" id="Gjc-6v-JiM"/>
+                                                        <constraint firstItem="k6p-iL-N9C" firstAttribute="leading" secondItem="ASN-UV-Hms" secondAttribute="leading" id="NxD-uh-ypy"/>
+                                                        <constraint firstItem="k6p-iL-N9C" firstAttribute="top" secondItem="ASN-UV-Hms" secondAttribute="top" id="fzc-40-Ota"/>
+                                                        <constraint firstItem="k6p-iL-N9C" firstAttribute="trailing" secondItem="ASN-UV-Hms" secondAttribute="trailing" id="vbu-BF-SYB"/>
+                                                    </constraints>
                                                 </tableViewCellContentView>
+                                                <connections>
+                                                    <outlet property="titleLabel" destination="hq6-zi-4NL" id="16H-O3-Ub2"/>
+                                                </connections>
                                             </tableViewCell>
                                         </prototypes>
                                         <connections>
