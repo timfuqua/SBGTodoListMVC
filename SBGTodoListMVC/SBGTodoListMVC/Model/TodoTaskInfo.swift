@@ -9,16 +9,24 @@
 import Foundation
 
 
+func ==(lhs: TodoTaskInfo, rhs: TodoTaskInfo) -> Bool {
+    return lhs.title == rhs.title
+        && lhs.type == rhs.type
+        && lhs.priority == rhs.priority
+        && lhs.completed == rhs.completed
+}
+
+
 // MARK:- TodoTaskInfo
 struct TodoTaskInfo {
     
-    enum TodoTaskType {
-        case text
+    enum TodoTaskType: Int {
+        case text = 0
         case taskList
     }
     
-    enum TodoTaskPriority {
-        case urgent
+    enum TodoTaskPriority: Int {
+        case urgent = 0
         case high
         case normal
     }

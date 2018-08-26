@@ -15,9 +15,6 @@ class TodoTaskCoreDataDataProvider: DataProvider {
 
     typealias T = NSManagedObject
     
-    // MARK: private vars
-    private var allTasks: [NSManagedObject] = []
-    
     // MARK: CoreData
     private var appDelegate: AppDelegate? {
         return UIApplication.shared.delegate as? AppDelegate
@@ -43,14 +40,15 @@ class TodoTaskCoreDataDataProvider: DataProvider {
 
 // MARK:- initialize
 extension TodoTaskCoreDataDataProvider {
-    func fetchAllTasks() {
-        guard let managedContext = managedContext else { return }
+    func fetchAllTasks() -> [NSManagedObject] {
+        guard let managedContext = managedContext else { return [] }
         
         do {
             let fetchedTasks = try managedContext.fetch(todoFetchRequestForFetch)
-            allTasks = fetchedTasks
+            return fetchedTasks
         } catch let error as NSError {
             debugLog("\(error)")
+            return []
         }
     }
 }
@@ -59,15 +57,7 @@ extension TodoTaskCoreDataDataProvider {
 // MARK:- get
 extension TodoTaskCoreDataDataProvider {
     func getAll() -> [NSManagedObject] {
-        return getAllTasks()
-    }
-    
-    func getAllTasks(afterFetch fetch: Bool = true) -> [NSManagedObject] {
-        if fetch {
-            fetchAllTasks()
-        }
-        
-        return allTasks
+        return fetchAllTasks()
     }
 }
 
@@ -75,22 +65,27 @@ extension TodoTaskCoreDataDataProvider {
 // MARK:- add
 extension TodoTaskCoreDataDataProvider {
     func add(_ value: NSManagedObject) {
-        addTask()
-    }
-    
-    func addTask() {
         guard let managedContext = managedContext else { return }
-        guard let todoTaskEntity = todoTaskEntity else { return }
-        let addedTask = NSManagedObject(entity: todoTaskEntity, insertInto: managedContext)
-        
-        addedTask.setValue("Test", forKey: "title")
-        
+
         do {
             try managedContext.save()
-            allTasks.append(addedTask)
         } catch let error as NSError {
             debugLog("\(error)")
         }
+    }
+    
+    func add(_ todoTask: TodoTaskInfo) {
+        guard let managedContext = managedContext else { return }
+        guard let todoTaskEntity = todoTaskEntity else { return }
+        
+        let addedTask = NSManagedObject(entity: todoTaskEntity, insertInto: managedContext)
+        
+        addedTask.setValue(todoTask.title, forKey: "title")
+        addedTask.setValue(todoTask.type.rawValue, forKey: "type")
+        addedTask.setValue(todoTask.priority.rawValue, forKey: "priority")
+        addedTask.setValue(todoTask.completed, forKey: "completed")
+
+        add(addedTask)
     }
 }
 
@@ -98,20 +93,12 @@ extension TodoTaskCoreDataDataProvider {
 // MARK:- remove
 extension TodoTaskCoreDataDataProvider {
     func remove(_ value: NSManagedObject) -> Bool {
-        return removeTask()
-    }
-    
-    func removeTask() -> Bool {
         guard let managedContext = managedContext else { return false }
         
+        managedContext.delete(value)
+        
         do {
-            let fetchedTasks = try managedContext.fetch(todoFetchRequestForFetch)
-            
-            if let firstTask = fetchedTasks.first {
-                managedContext.delete(firstTask)
-                allTasks.removeFirst()
-            }
-            
+            try managedContext.save()
             return true
         } catch let error as NSError {
             debugLog("\(error)")
@@ -119,18 +106,32 @@ extension TodoTaskCoreDataDataProvider {
         }
     }
     
-    func removeAll() {
-        removeAllTasks()
+    func remove(_ todoTask: TodoTaskInfo) -> Bool {
+        guard let managedContext = managedContext else { return false }
+        
+        do {
+            let fetchedTasks = try managedContext.fetch(todoFetchRequestForFetch)
+            
+            for task in fetchedTasks {
+                if task == todoTask {
+                    return remove(task)
+                }
+            }
+            
+            return false
+        } catch let error as NSError {
+            debugLog("\(error)")
+            return false
+        }
     }
     
-    func removeAllTasks() {
+    func removeAll() {
         guard let managedContext = managedContext else { return }
         let deleteAllRequest = NSBatchDeleteRequest(fetchRequest: todoFetchRequestForRemove)
         
         do {
             try managedContext.execute(deleteAllRequest)
             try managedContext.save()
-            allTasks.removeAll()
         } catch let error as NSError {
             debugLog("\(error)")
         }

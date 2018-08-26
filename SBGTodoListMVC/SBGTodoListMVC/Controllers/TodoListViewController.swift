@@ -473,14 +473,10 @@ extension TodoListViewController {
             }
         }
     }
-}
-
-
-// MARK:- UITableViewDelegate
-extension TodoListViewController {
+    
     func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
         guard let sectionAndItem = getSectionAndItem(forIndexPath: indexPath) else { return false }
-
+        
         switch sectionAndItem {
         case let (_,item) where item == .noTasks:
             return false
@@ -488,7 +484,19 @@ extension TodoListViewController {
             return true
         }
     }
-    func tableView(_ tableView: UITableView, accessoryButtonTappedForRowWith indexPath: IndexPath) {
-        debugLog("section: \(indexPath.section); row: \(indexPath.row)")
+}
+
+
+// MARK:- UITableViewDelegate
+extension TodoListViewController {
+    func tableView(_ tableView: UITableView, shouldHighlightRowAt indexPath: IndexPath) -> Bool {
+        guard let sectionAndItem = getSectionAndItem(forIndexPath: indexPath) else { return false }
+        
+        switch sectionAndItem {
+        case let (_,item) where item == .noTasks:
+            return false
+        default:
+            return true
+        }
     }
 }
