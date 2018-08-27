@@ -72,6 +72,8 @@ class TodoListViewController: TableDataViewController {
     private var uncompletedTasks: [TodoTaskInfo] = []
     private var completedTasks: [TodoTaskInfo] = []
     private var dataProvider: TodoTaskInfoDataProvider!
+    
+    private let showTodoTaskInfoSegue = "showTodoTaskInfoSegue"
 
     // MARK: @IBOutlets
     @IBOutlet private weak var todoListTableView: UITableView!
@@ -247,6 +249,28 @@ extension TodoListViewController {
 }
 
 
+// MARK:- navigation
+extension TodoListViewController {
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        if let destination = segue.destination as? TodoTaskInfoViewController {
+            if let indexPath = tableView?.indexPathForSelectedRow, segue.identifier == showTodoTaskInfoSegue {
+                guard let sectionAndItem = getSectionAndItem(forIndexPath: indexPath) else { return }
+                
+                switch sectionAndItem.0 {
+                case .uncompleted: destination.todoTaskInfo = uncompletedTasks[indexPath.row]
+                case .completed: destination.todoTaskInfo = completedTasks[indexPath.row]
+                default: fatalError("Unrecognized section")
+                }
+            } else {
+                fatalError("Unrecognized segue")
+            }
+        } else {
+            fatalError("Unrecognized segue")
+        }
+    }
+}
+
+
 // MARK:- data source generation
 extension TodoListViewController {
     private func headerText(forSection section: TodoListSection) -> OptionalStringGenerator {
@@ -387,6 +411,20 @@ extension TodoListViewController {
 
 // MARK:- UITableViewDataSource
 extension TodoListViewController {
+    func todoTaskInfo(forIndexPath indexPath: IndexPath) -> TodoTaskInfo? {
+        guard let sectionAndItem = getSectionAndItem(forIndexPath: indexPath) else { return nil }
+        
+        switch sectionAndItem {
+        case let (section,item) where item == .task:
+            switch section {
+            case .uncompleted: return uncompletedTasks[indexPath.row]
+            case .completed: return completedTasks[indexPath.row]
+            default: return nil
+            }
+        default: return nil
+        }
+    }
+    
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         guard let sectionAndItem = getSectionAndItem(forIndexPath: indexPath) else { return UITableViewCell() }
         let tableDataItem = tableData.item(forIndexPath: indexPath)
@@ -405,18 +443,10 @@ extension TodoListViewController {
             }
             
             return cell
-        case let (section,item) where item == .task:
+        case let (_,item) where item == .task:
+            guard let todoTaskInfo = todoTaskInfo(forIndexPath: indexPath) else { fatalError() }
             let cell: TodoTaskInfoTableViewCell = tableView.dequeueReusableCell(withIdentifier: tableDataItem.identifier(), for: indexPath) as! TodoTaskInfoTableViewCell
-            
-            switch section {
-            case .uncompleted:
-                cell.configure(fromTodoTaskInfo: uncompletedTasks[indexPath.row])
-            case .completed:
-                cell.configure(fromTodoTaskInfo: completedTasks[indexPath.row])
-            default:
-                fatalError()
-            }
-            
+            cell.configure(fromTodoTaskInfo: todoTaskInfo)
             return cell
         default:
             return UITableViewCell()
@@ -424,28 +454,14 @@ extension TodoListViewController {
     }
     
     func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCellEditingStyle, forRowAt indexPath: IndexPath) {
-        guard let sectionAndItem = getSectionAndItem(forIndexPath: indexPath) else { return }
-
         if editingStyle == .delete {
-            if sectionAndItem.0 == .uncompleted {
-                remove(uncompletedTasks[indexPath.row])
-            } else if sectionAndItem.0 == .completed {
-                remove(completedTasks[indexPath.row])
-            } else {
-                return
-            }
+            guard let todoTaskInfo = todoTaskInfo(forIndexPath: indexPath) else { return }
+            remove(todoTaskInfo)
         }
     }
     
     func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
-        guard let sectionAndItem = getSectionAndItem(forIndexPath: indexPath) else { return false }
-        
-        switch sectionAndItem {
-        case let (_,item) where item == .noTasks:
-            return false
-        default:
-            return true
-        }
+        return todoTaskInfo(forIndexPath: indexPath) != nil
     }
 }
 
@@ -453,13 +469,10 @@ extension TodoListViewController {
 // MARK:- UITableViewDelegate
 extension TodoListViewController {
     func tableView(_ tableView: UITableView, shouldHighlightRowAt indexPath: IndexPath) -> Bool {
-        guard let sectionAndItem = getSectionAndItem(forIndexPath: indexPath) else { return false }
-        
-        switch sectionAndItem {
-        case let (_,item) where item == .noTasks:
-            return false
-        default:
-            return true
-        }
+        return todoTaskInfo(forIndexPath: indexPath) != nil
+    }
+    
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        performSegue(withIdentifier: showTodoTaskInfoSegue, sender: self)
     }
 }
