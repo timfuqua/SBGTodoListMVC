@@ -20,15 +20,49 @@ func ==(lhs: TodoTaskInfo, rhs: TodoTaskInfo) -> Bool {
 // MARK:- TodoTaskInfo
 struct TodoTaskInfo {
     
-    enum TodoTaskType: Int {
+    // MARK: TodoTaskType
+    enum TodoTaskType: Int, CaseIterable {
         case text = 0
         case taskList
+        
+        init(name: String) {
+            switch name {
+            case "text","Text": self.init(rawValue: 0)!
+            case "taskList","TaskList": self.init(rawValue: 1)!
+            default: self.init(rawValue: 0)!
+            }
+        }
+        
+        var name: String {
+            switch self {
+            case .text: return "Text"
+            case .taskList: return "Task List"
+            }
+        }
     }
     
-    enum TodoTaskPriority: Int {
+    // MARK: TodoTaskPriority
+    enum TodoTaskPriority: Int, CaseIterable {
         case urgent = 0
         case high
         case normal
+        
+        init(name: String) {
+            switch name {
+            case "urgent","Urgent": self.init(rawValue: 0)!
+            case "high","High": self.init(rawValue: 1)!
+            case "normal","Normal": self.init(rawValue: 2)!
+            default: self.init(rawValue: 2)!
+            }
+        }
+        
+        var name: String {
+            switch self {
+            case .urgent: return "Urgent"
+            case .high: return "High"
+            case .normal: return "Normal"
+            }
+        }
     }
     
     var title: String

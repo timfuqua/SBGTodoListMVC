@@ -12,6 +12,14 @@
 		C467099B2133562D006CBFCC /* TodoTaskInfoDataProviderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C467099A2133562D006CBFCC /* TodoTaskInfoDataProviderTests.swift */; };
 		C467099D2133607A006CBFCC /* TodoTaskInfoTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = C467099C2133607A006CBFCC /* TodoTaskInfoTableViewCell.swift */; };
 		C467099F21336F6D006CBFCC /* TodoTaskInfoViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C467099E21336F6D006CBFCC /* TodoTaskInfoViewController.swift */; };
+		C46709A121338157006CBFCC /* LabelTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = C46709A021338157006CBFCC /* LabelTableViewCell.swift */; };
+		C46709A5213382C7006CBFCC /* TextFieldTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = C46709A4213382C7006CBFCC /* TextFieldTableViewCell.swift */; };
+		C46709A721338A16006CBFCC /* SegmentedTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = C46709A621338A16006CBFCC /* SegmentedTableViewCell.swift */; };
+		C46709A921338DAB006CBFCC /* LabelAndSwitchTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = C46709A821338DAB006CBFCC /* LabelAndSwitchTableViewCell.swift */; };
+		C46709AB2133909D006CBFCC /* ButtonTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = C46709AA2133909D006CBFCC /* ButtonTableViewCell.swift */; };
+		C46709AD2133992C006CBFCC /* MimicCaseIterable.swift in Sources */ = {isa = PBXBuildFile; fileRef = C46709AC2133992C006CBFCC /* MimicCaseIterable.swift */; };
+		C46709AF2133A68A006CBFCC /* UIViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C46709AE2133A68A006CBFCC /* UIViewController.swift */; };
+		C46709B12133B096006CBFCC /* Delay.swift in Sources */ = {isa = PBXBuildFile; fileRef = C46709B02133B096006CBFCC /* Delay.swift */; };
 		C4D5C0C7212FA72B00C4017A /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4D5C0C6212FA72B00C4017A /* AppDelegate.swift */; };
 		C4D5C0CC212FA72B00C4017A /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C4D5C0CA212FA72B00C4017A /* Main.storyboard */; };
 		C4D5C0CF212FA72B00C4017A /* SBGTodoListMVC.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = C4D5C0CD212FA72B00C4017A /* SBGTodoListMVC.xcdatamodeld */; };
@@ -46,6 +54,14 @@
 		C467099A2133562D006CBFCC /* TodoTaskInfoDataProviderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodoTaskInfoDataProviderTests.swift; sourceTree = "<group>"; };
 		C467099C2133607A006CBFCC /* TodoTaskInfoTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodoTaskInfoTableViewCell.swift; sourceTree = "<group>"; };
 		C467099E21336F6D006CBFCC /* TodoTaskInfoViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodoTaskInfoViewController.swift; sourceTree = "<group>"; };
+		C46709A021338157006CBFCC /* LabelTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LabelTableViewCell.swift; sourceTree = "<group>"; };
+		C46709A4213382C7006CBFCC /* TextFieldTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextFieldTableViewCell.swift; sourceTree = "<group>"; };
+		C46709A621338A16006CBFCC /* SegmentedTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SegmentedTableViewCell.swift; sourceTree = "<group>"; };
+		C46709A821338DAB006CBFCC /* LabelAndSwitchTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LabelAndSwitchTableViewCell.swift; sourceTree = "<group>"; };
+		C46709AA2133909D006CBFCC /* ButtonTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ButtonTableViewCell.swift; sourceTree = "<group>"; };
+		C46709AC2133992C006CBFCC /* MimicCaseIterable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MimicCaseIterable.swift; sourceTree = "<group>"; };
+		C46709AE2133A68A006CBFCC /* UIViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIViewController.swift; sourceTree = "<group>"; };
+		C46709B02133B096006CBFCC /* Delay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Delay.swift; sourceTree = "<group>"; };
 		C4D5C0C3212FA72B00C4017A /* SBGTodoListMVC.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SBGTodoListMVC.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		C4D5C0C6212FA72B00C4017A /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		C4D5C0CB212FA72B00C4017A /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
@@ -156,6 +172,11 @@
 		C4D5C0EB212FA95900C4017A /* View */ = {
 			isa = PBXGroup;
 			children = (
+				C46709AA2133909D006CBFCC /* ButtonTableViewCell.swift */,
+				C46709A821338DAB006CBFCC /* LabelAndSwitchTableViewCell.swift */,
+				C46709A021338157006CBFCC /* LabelTableViewCell.swift */,
+				C46709A621338A16006CBFCC /* SegmentedTableViewCell.swift */,
+				C46709A4213382C7006CBFCC /* TextFieldTableViewCell.swift */,
 				C467099C2133607A006CBFCC /* TodoTaskInfoTableViewCell.swift */,
 			);
 			path = View;
@@ -168,6 +189,7 @@
 				C4D5C0F8212FBF5900C4017A /* Collection.swift */,
 				C4D5C0F4212FABB100C4017A /* String.swift */,
 				C4D5C0F6212FABF400C4017A /* Time.swift */,
+				C46709AE2133A68A006CBFCC /* UIViewController.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -177,6 +199,8 @@
 			children = (
 				C4D5C0F2212FAB8800C4017A /* Logger.swift */,
 				C4D5C0F0212FAB0300C4017A /* TableDataController.swift */,
+				C46709AC2133992C006CBFCC /* MimicCaseIterable.swift */,
+				C46709B02133B096006CBFCC /* Delay.swift */,
 			);
 			path = Helpers;
 			sourceTree = "<group>";
@@ -286,16 +310,24 @@
 				C4D5C0F5212FABB100C4017A /* String.swift in Sources */,
 				C4D5C0FD21306E8800C4017A /* TodoTaskInfo.swift in Sources */,
 				C4D5C0F3212FAB8800C4017A /* Logger.swift in Sources */,
+				C46709A921338DAB006CBFCC /* LabelAndSwitchTableViewCell.swift in Sources */,
 				C4D5C0F7212FABF400C4017A /* Time.swift in Sources */,
+				C46709AF2133A68A006CBFCC /* UIViewController.swift in Sources */,
 				C4D5C0EF212FA9B600C4017A /* TodoListViewController.swift in Sources */,
+				C46709A721338A16006CBFCC /* SegmentedTableViewCell.swift in Sources */,
 				C4D5C1032131F56900C4017A /* DataProvider.swift in Sources */,
+				C46709AD2133992C006CBFCC /* MimicCaseIterable.swift in Sources */,
 				C4D5C0CF212FA72B00C4017A /* SBGTodoListMVC.xcdatamodeld in Sources */,
 				C4D5C0F1212FAB0300C4017A /* TableDataController.swift in Sources */,
 				C467099721333E1E006CBFCC /* TodoTaskInfo+CoreData.swift in Sources */,
+				C46709AB2133909D006CBFCC /* ButtonTableViewCell.swift in Sources */,
+				C46709A121338157006CBFCC /* LabelTableViewCell.swift in Sources */,
 				C4D5C0C7212FA72B00C4017A /* AppDelegate.swift in Sources */,
 				C4D5C0FF2131C6BB00C4017A /* TodoTaskCoreDataDataProvider.swift in Sources */,
 				C467099D2133607A006CBFCC /* TodoTaskInfoTableViewCell.swift in Sources */,
 				C4D5C0F9212FBF5900C4017A /* Collection.swift in Sources */,
+				C46709A5213382C7006CBFCC /* TextFieldTableViewCell.swift in Sources */,
+				C46709B12133B096006CBFCC /* Delay.swift in Sources */,
 				C467099F21336F6D006CBFCC /* TodoTaskInfoViewController.swift in Sources */,
 				C467099921333FB7006CBFCC /* TodoTaskInfoDataProvider.swift in Sources */,
 			);

@@ -23,8 +23,18 @@ extension TodoTaskInfo {
     init(fromNSManagedObject object: NSManagedObject) {
         title = (object.value(forKey: "title") as? String) ?? ""
         
-        type = .text
-        priority = .normal
-        completed = false
+        if let typeInt = object.value(forKey: "type") as? Int, let todoTaskType = TodoTaskType(rawValue: typeInt) {
+            type = todoTaskType
+        } else {
+            type = .text
+        }
+        
+        if let priorityInt = object.value(forKey: "priority") as? Int, let todoTaskPriority = TodoTaskPriority(rawValue: priorityInt) {
+            priority = todoTaskPriority
+        } else {
+            priority = .normal
+        }
+        
+        completed = (object.value(forKey: "completed") as? Bool) ?? false
     }
 }

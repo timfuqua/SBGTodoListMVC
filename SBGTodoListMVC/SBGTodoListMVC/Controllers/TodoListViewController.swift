@@ -7,7 +7,6 @@
 //
 
 import UIKit
-import CoreData
 
 
 // MARK:- TodoListViewController sections
@@ -55,7 +54,7 @@ private extension TodoListViewController {
 
 
 // MARK:- TodoListViewController
-class TodoListViewController: TableDataViewController {
+class TodoListViewController: TableDataViewController, TodoTaskInfoDelegate {
     
     // MARK: vars
     private var allTasks: [TodoTaskInfo] = [] {
@@ -73,7 +72,10 @@ class TodoListViewController: TableDataViewController {
     private var completedTasks: [TodoTaskInfo] = []
     private var dataProvider: TodoTaskInfoDataProvider!
     
-    private let showTodoTaskInfoSegue = "showTodoTaskInfoSegue"
+    private let editTodoTaskInfoSegue = "editTodoTaskInfoSegue"
+    private let addTodoTaskInfoSegue = "addTodoTaskInfoSegue"
+    
+    private var currentlyEditingTodoTask: TodoTaskInfo?
 
     // MARK: @IBOutlets
     @IBOutlet private weak var todoListTableView: UITableView!
@@ -115,20 +117,7 @@ extension TodoListViewController {
     }
     
     private func newTask() {
-        let alert = UIAlertController(title: "New Task", message: "Add a new task", preferredStyle: .alert)
-        let saveAction = UIAlertAction(title: "Save", style: .default) { [unowned self] action in
-            guard let textField = alert.textFields?.first, let taskTitle = textField.text else { return }
-            self.saveTask(withTitle: taskTitle)
-        }
-        
-        let cancelAction = UIAlertAction(title: "Cancel", style: .default)
-        
-        alert.addTextField()
-        
-        alert.addAction(saveAction)
-        alert.addAction(cancelAction)
-        
-        present(alert, animated: true)
+        performSegue(withIdentifier: addTodoTaskInfoSegue, sender: self)
     }
     
     private func saveTask(withTitle title: String) {
@@ -198,7 +187,12 @@ extension TodoListViewController {
         debugLog()
         
         addObservers()
-        tableView = todoListTableView
+        
+        if tableView == nil {
+            tableView = todoListTableView
+        }
+        
+        currentlyEditingTodoTask = nil
         
         exitEditMode()
         updateView()
@@ -253,7 +247,7 @@ extension TodoListViewController {
 extension TodoListViewController {
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if let destination = segue.destination as? TodoTaskInfoViewController {
-            if let indexPath = tableView?.indexPathForSelectedRow, segue.identifier == showTodoTaskInfoSegue {
+            if let indexPath = tableView?.indexPathForSelectedRow, segue.identifier == editTodoTaskInfoSegue {
                 guard let sectionAndItem = getSectionAndItem(forIndexPath: indexPath) else { return }
                 
                 switch sectionAndItem.0 {
@@ -261,9 +255,14 @@ extension TodoListViewController {
                 case .completed: destination.todoTaskInfo = completedTasks[indexPath.row]
                 default: fatalError("Unrecognized section")
                 }
+                
+                destination.delegate = self
             } else {
                 fatalError("Unrecognized segue")
             }
+        } else if let nc = segue.destination as? UINavigationController, let destination = nc.childViewControllers.first as? TodoTaskInfoViewController, segue.identifier == addTodoTaskInfoSegue {
+            destination.todoTaskInfo = TodoTaskInfo(title: "", type: .text, priority: .normal, completed: false)
+            destination.delegate = self
         } else {
             fatalError("Unrecognized segue")
         }
@@ -294,7 +293,7 @@ extension TodoListViewController {
     }
     
     private func footerText(forSection section: TodoListSection) -> OptionalStringGenerator {
-        return { nil }
+        return { "" }
     }
     
     private func footerFont(forSection section: TodoListSection) -> UIFontGenerator {
@@ -316,8 +315,8 @@ extension TodoListViewController {
     private func generateNoTasksItem() -> Item {
         let type = TodoListItem.noTasks
         let identifier: StringGenerator = { "noTasksCell" }
-        let estimatedRowHeight: CGFloatGenerator = { 19.0 }
-        let rowHeight: CGFloatGenerator = { UITableViewAutomaticDimension }
+        let estimatedRowHeight: CGFloatGenerator = { 27.0 }
+        let rowHeight: CGFloatGenerator = { 27.0 }
         let customDescription: OptionalStringGenerator = { "item type: \(type.debugName), identifier: \(identifier()), estimatedRowHeight: \(estimatedRowHeight()), rowHeight: \(rowHeight())" }
         return Item(type: type.rawValue, identifier: identifier, estimatedRowHeight: estimatedRowHeight, rowHeight: rowHeight, customDescription: customDescription)
     }
@@ -325,8 +324,8 @@ extension TodoListViewController {
     private func generateTaskItem() -> Item {
         let type = TodoListItem.task
         let identifier: StringGenerator = { "taskCell" }
-        let estimatedRowHeight: CGFloatGenerator = { 19.0 }
-        let rowHeight: CGFloatGenerator = { UITableViewAutomaticDimension }
+        let estimatedRowHeight: CGFloatGenerator = { 27.0 }
+        let rowHeight: CGFloatGenerator = { 27.0 }
         let customDescription: OptionalStringGenerator = { "item type: \(type.debugName), identifier: \(identifier()), estimatedRowHeight: \(estimatedRowHeight()), rowHeight: \(rowHeight())" }
         return Item(type: type.rawValue, identifier: identifier, estimatedRowHeight: estimatedRowHeight, rowHeight: rowHeight, customDescription: customDescription)
     }
@@ -412,6 +411,7 @@ extension TodoListViewController {
 // MARK:- UITableViewDataSource
 extension TodoListViewController {
     func todoTaskInfo(forIndexPath indexPath: IndexPath) -> TodoTaskInfo? {
+        guard allTasks.isEmpty == false else { return nil }
         guard let sectionAndItem = getSectionAndItem(forIndexPath: indexPath) else { return nil }
         
         switch sectionAndItem {
@@ -473,6 +473,24 @@ extension TodoListViewController {
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        performSegue(withIdentifier: showTodoTaskInfoSegue, sender: self)
+        currentlyEditingTodoTask = todoTaskInfo(forIndexPath: indexPath)
+        performSegue(withIdentifier: editTodoTaskInfoSegue, sender: self)
+    }
+}
+
+
+// MARK:- TodoListInfoDelegate
+extension TodoListViewController {
+    func createOrUpdate(todoTaskInfo: TodoTaskInfo) {
+        if let currentlyEditingTodoTask = currentlyEditingTodoTask {
+            dataProvider.remove(currentlyEditingTodoTask)
+        }
+        dataProvider.add(todoTaskInfo)
+        updateView()
+    }
+    
+    func delete(todoTaskInfo: TodoTaskInfo) {
+        dataProvider.remove(todoTaskInfo)
+        updateView()
     }
 }
