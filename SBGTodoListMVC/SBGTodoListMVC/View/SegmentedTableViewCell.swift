@@ -50,13 +50,15 @@ extension SegmentedTableViewCell {
 extension SegmentedTableViewCell {
     func configure(withSelectionOptions options: [String], withInitialSelection initialSelection: String, andDelegate delegate: SegmentedTableViewCellDelegate? = nil) {
         var initialSelectionIndex: Int = 0
+
+        for option in options {
+            segmentedControl.insertSegment(withTitle: option, at: 0, animated: false)
+        }
         
-        for (index,option) in options.enumerated() {
-            if initialSelection != option {
+        for (index,option) in options.reversed().enumerated() {
+            if initialSelection == option {
                 initialSelectionIndex = index
             }
-            
-            segmentedControl.insertSegment(withTitle: option, at: 0, animated: false)
         }
         
         segmentedControl.selectedSegmentIndex = initialSelectionIndex

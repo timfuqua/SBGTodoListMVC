@@ -28,7 +28,7 @@ struct TodoTaskInfo {
         init(name: String) {
             switch name {
             case "text","Text": self.init(rawValue: 0)!
-            case "taskList","TaskList": self.init(rawValue: 1)!
+            case "taskList","Task List": self.init(rawValue: 1)!
             default: self.init(rawValue: 0)!
             }
         }
